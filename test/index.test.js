@@ -4,24 +4,24 @@ const chaiAsPromised = require('chai-as-promised');
 chai.use(spies);
 chai.use(chaiAsPromised);
 const { assert, expect } = chai;
-const { syncForeach, symbols } = require('../index');
+const { symbols } = require('../index');
 
 const iterable = [];
 const iterator = () => {};
 const onResolved = () => {};
 const onRejected = () => {};
 
-describe(`syncForeach`, () => {
+describe(`Promise.all.meta`, () => {
 	it(`returns a function`, () => {
-		return assert.isFunction(syncForeach);
+		return assert.isFunction(Promise.all.meta);
 	});
 
 	it(`accepts 4 arguments`, () => {
-		return assert.equal(syncForeach.length, 4);
+		return assert.equal(Promise.all.meta.length, 4);
 	});
 
 	it(`returns a promise when executed`, () => {
-		return assert.exists(syncForeach(iterable, iterator, onResolved, onRejected).then);
+		return assert.exists(Promise.all.meta(iterable, iterator, onResolved, onRejected).then);
 	});
 
 	describe(`arguments`, () => {
@@ -31,7 +31,7 @@ describe(`syncForeach`, () => {
 				const iterator = (value) => Promise.resolve(value);
 				const spy = chai.spy(iterator);
 
-				syncForeach(iterable, spy, onResolved, onRejected);
+				Promise.all.meta(iterable, spy, onResolved, onRejected);
 
 				expect(spy).to.have.been.called.exactly(3);
 				expect(spy).to.have.been.first.called.with(0);
@@ -50,7 +50,7 @@ describe(`syncForeach`, () => {
 				const iterator = (value) => value.reject ? Promise.reject() : Promise.resolve();
 				const resolveSpy = chai.spy(() => {});
 
-				return syncForeach(iterable, iterator, resolveSpy).catch((e) => {
+				return Promise.all.meta(iterable, iterator, resolveSpy).catch((e) => {
 					return expect(resolveSpy).to.have.been.called.exactly(2);
 				});
 			});
@@ -61,7 +61,7 @@ describe(`syncForeach`, () => {
 				const onResolved = () => {};
 				const spy = chai.spy(onResolved);
 
-				await syncForeach(iterable, iterator, spy, onRejected);
+				await Promise.all.meta(iterable, iterator, spy, onRejected);
 
 				expect(spy).to.have.been.first.called.with(0);
 				expect(spy).to.have.been.second.called.with(1);
@@ -72,7 +72,7 @@ describe(`syncForeach`, () => {
 				const iterable = [0, 1, 2];
 				const iterator = (value) => Promise.resolve(value);
 
-				const traversed = syncForeach(iterable, iterator, (result) => {
+				const traversed = Promise.all.meta(iterable, iterator, (result) => {
 					return {
 						value: result,
 					};
@@ -98,7 +98,7 @@ describe(`syncForeach`, () => {
 				const iterator = (value) => value.reject ? Promise.reject() : Promise.resolve();
 				const rejectSpy = chai.spy(() => {});
 
-				return syncForeach(iterable, iterator, onResolved, rejectSpy).catch((e) => {
+				return Promise.all.meta(iterable, iterator, onResolved, rejectSpy).catch((e) => {
 					expect(rejectSpy).to.have.been.called.exactly(1);
 				});
 			});
@@ -109,7 +109,7 @@ describe(`syncForeach`, () => {
 				const onRejected = () => {};
 				const spy = chai.spy(onRejected);
 
-				return syncForeach(iterable, iterator, onResolved, spy).catch((e) => {
+				return Promise.all.meta(iterable, iterator, onResolved, spy).catch((e) => {
 					expect(spy).to.have.been.first.called.with(0);
 					expect(spy).to.have.been.second.called.with(1);
 					expect(spy).to.have.been.third.called.with(2);
@@ -120,7 +120,7 @@ describe(`syncForeach`, () => {
 				const iterable = [0, 1, 2];
 				const iterator = (value) => Promise.reject(value);
 
-				const traversed = syncForeach(iterable, iterator, onResolved, (result) => {
+				const traversed = Promise.all.meta(iterable, iterator, onResolved, (result) => {
 					return {
 						value: result,
 					};
@@ -141,7 +141,7 @@ describe(`syncForeach`, () => {
 				const iterable = [0, 1, 2];
 				const iterator = () => Promise.resolve();
 
-				return syncForeach(iterable, iterator).then(() => {
+				return Promise.all.meta(iterable, iterator).then(() => {
 					assert.isTrue(true)
 				}).catch((e) => {
 					assert.fail('.then was not called');
@@ -170,7 +170,7 @@ describe(`syncForeach`, () => {
 					error: null,
 				}];
 
-				return syncForeach(iterable, iterator).then((results) => {
+				return Promise.all.meta(iterable, iterator).then((results) => {
 					assert.deepEqual(results, expected);
 				}).catch((e) => {
 					assert.fail('.then was not called');
@@ -187,7 +187,7 @@ describe(`syncForeach`, () => {
 				];
 				const iterator = (value) => value.reject ? Promise.reject() : Promise.resolve();
 
-				return syncForeach(iterable, iterator).then(() => {
+				return Promise.all.meta(iterable, iterator).then(() => {
 					assert.fail('.catch was not called')
 				}).catch((e) => {
 					assert.isTrue(true);
@@ -198,7 +198,7 @@ describe(`syncForeach`, () => {
 				const iterable = [0, 1, 2];
 				const iterator = () => Promise.reject();
 
-				return syncForeach(iterable, iterator).then(() => {
+				return Promise.all.meta(iterable, iterator).then(() => {
 					assert.fail('did not run .catch');
 				}).catch(({ all, resolved, rejected }) => {
 					assert.isOk(all);
