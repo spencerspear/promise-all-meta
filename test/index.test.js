@@ -4,24 +4,24 @@ const chaiAsPromised = require('chai-as-promised');
 chai.use(spies);
 chai.use(chaiAsPromised);
 const { assert, expect } = chai;
-const { symbols } = require('../index');
+const { promiseAllMeta, symbols } = require('../index');
 
 const iterable = [];
 const iterator = () => {};
 const onResolved = () => {};
 const onRejected = () => {};
 
-describe(`Promise.all.meta`, () => {
+describe(`promiseAllMeta`, () => {
 	it(`returns a function`, () => {
-		return assert.isFunction(Promise.all.meta);
+		return assert.isFunction(promiseAllMeta);
 	});
 
 	it(`accepts 4 arguments`, () => {
-		return assert.equal(Promise.all.meta.length, 4);
+		return assert.equal(promiseAllMeta.length, 4);
 	});
 
 	it(`returns a promise when executed`, () => {
-		return assert.exists(Promise.all.meta(iterable, iterator, onResolved, onRejected).then);
+		return assert.exists(promiseAllMeta(iterable, iterator, onResolved, onRejected).then);
 	});
 
 	describe(`arguments`, () => {
@@ -31,7 +31,7 @@ describe(`Promise.all.meta`, () => {
 				const iterator = (value) => Promise.resolve(value);
 				const spy = chai.spy(iterator);
 
-				Promise.all.meta(iterable, spy, onResolved, onRejected);
+				promiseAllMeta(iterable, spy, onResolved, onRejected);
 
 				expect(spy).to.have.been.called.exactly(3);
 				expect(spy).to.have.been.first.called.with(0);
@@ -50,7 +50,7 @@ describe(`Promise.all.meta`, () => {
 				const iterator = (value) => value.reject ? Promise.reject() : Promise.resolve();
 				const resolveSpy = chai.spy(() => {});
 
-				return Promise.all.meta(iterable, iterator, resolveSpy).catch((e) => {
+				return promiseAllMeta(iterable, iterator, resolveSpy).catch((e) => {
 					return expect(resolveSpy).to.have.been.called.exactly(2);
 				});
 			});
@@ -61,7 +61,7 @@ describe(`Promise.all.meta`, () => {
 				const onResolved = () => {};
 				const spy = chai.spy(onResolved);
 
-				await Promise.all.meta(iterable, iterator, spy, onRejected);
+				await promiseAllMeta(iterable, iterator, spy, onRejected);
 
 				expect(spy).to.have.been.first.called.with(0);
 				expect(spy).to.have.been.second.called.with(1);
@@ -72,7 +72,7 @@ describe(`Promise.all.meta`, () => {
 				const iterable = [0, 1, 2];
 				const iterator = (value) => Promise.resolve(value);
 
-				const traversed = Promise.all.meta(iterable, iterator, (result) => {
+				const traversed = promiseAllMeta(iterable, iterator, (result) => {
 					return {
 						value: result,
 					};
@@ -98,7 +98,7 @@ describe(`Promise.all.meta`, () => {
 				const iterator = (value) => value.reject ? Promise.reject() : Promise.resolve();
 				const rejectSpy = chai.spy(() => {});
 
-				return Promise.all.meta(iterable, iterator, onResolved, rejectSpy).catch((e) => {
+				return promiseAllMeta(iterable, iterator, onResolved, rejectSpy).catch((e) => {
 					expect(rejectSpy).to.have.been.called.exactly(1);
 				});
 			});
@@ -109,7 +109,7 @@ describe(`Promise.all.meta`, () => {
 				const onRejected = () => {};
 				const spy = chai.spy(onRejected);
 
-				return Promise.all.meta(iterable, iterator, onResolved, spy).catch((e) => {
+				return promiseAllMeta(iterable, iterator, onResolved, spy).catch((e) => {
 					expect(spy).to.have.been.first.called.with(0);
 					expect(spy).to.have.been.second.called.with(1);
 					expect(spy).to.have.been.third.called.with(2);
@@ -120,7 +120,7 @@ describe(`Promise.all.meta`, () => {
 				const iterable = [0, 1, 2];
 				const iterator = (value) => Promise.reject(value);
 
-				const traversed = Promise.all.meta(iterable, iterator, onResolved, (result) => {
+				const traversed = promiseAllMeta(iterable, iterator, onResolved, (result) => {
 					return {
 						value: result,
 					};
@@ -141,7 +141,7 @@ describe(`Promise.all.meta`, () => {
 				const iterable = [0, 1, 2];
 				const iterator = () => Promise.resolve();
 
-				return Promise.all.meta(iterable, iterator).then(() => {
+				return promiseAllMeta(iterable, iterator).then(() => {
 					assert.isTrue(true)
 				}).catch((e) => {
 					assert.fail('.then was not called');
@@ -170,7 +170,7 @@ describe(`Promise.all.meta`, () => {
 					error: null,
 				}];
 
-				return Promise.all.meta(iterable, iterator).then((results) => {
+				return promiseAllMeta(iterable, iterator).then((results) => {
 					assert.deepEqual(results, expected);
 				}).catch((e) => {
 					assert.fail('.then was not called');
@@ -187,7 +187,7 @@ describe(`Promise.all.meta`, () => {
 				];
 				const iterator = (value) => value.reject ? Promise.reject() : Promise.resolve();
 
-				return Promise.all.meta(iterable, iterator).then(() => {
+				return promiseAllMeta(iterable, iterator).then(() => {
 					assert.fail('.catch was not called')
 				}).catch((e) => {
 					assert.isTrue(true);
@@ -198,7 +198,7 @@ describe(`Promise.all.meta`, () => {
 				const iterable = [0, 1, 2];
 				const iterator = () => Promise.reject();
 
-				return Promise.all.meta(iterable, iterator).then(() => {
+				return promiseAllMeta(iterable, iterator).then(() => {
 					assert.fail('did not run .catch');
 				}).catch(({ all, resolved, rejected }) => {
 					assert.isOk(all);

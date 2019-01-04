@@ -1,4 +1,4 @@
-# Promise.all.meta()
+# promiseAllMeta()
 ### Additional Data In Your Promise Results
 
 This module operates the same way as `Promise.all()` except that it passes additional useful information to both (1) the `.then()` method and (2) the `.catch()` method.
@@ -36,7 +36,7 @@ const onRejected = (rejectedValue) => {
 	return { additional: 'rejected-data' };
 };
 
-const grouped = Promise.all.meta(iterable, iterator, before, onResolved, onRejected);
+const grouped = promiseAllMeta(iterable, iterator, before, onResolved, onRejected);
 
 grouped.then((all) => {
 	console.log(all);

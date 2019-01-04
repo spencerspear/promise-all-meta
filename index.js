@@ -1,7 +1,7 @@
 const RESOLVED = Symbol('resolved');
 const REJECTED = Symbol('rejected');
 
-function metatize(iterable, iterator, onResolved, onRejected) {
+function promiseAllMeta(iterable, iterator, onResolved, onRejected) {
 	const promises = iterable.map((item) => {
 		return iterator(item);
 	});
@@ -59,6 +59,5 @@ function rejectedPromises(categorized) {
 	});
 }
 
-Promise.all.meta = metatize;
-
 exports.symbols = { RESOLVED, REJECTED };
+exports.promiseAllMeta = promiseAllMeta;
